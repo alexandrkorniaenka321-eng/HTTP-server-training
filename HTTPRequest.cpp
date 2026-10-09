@@ -43,7 +43,6 @@ HTTPRequest parse_http_request(const std::string &http_request)
     std::string buffer;
     while (i < end_of_request_line)
     {
-        buffer += http_request[i];
         if (http_request[i] == ' ')
         {
             ++type;
@@ -56,6 +55,10 @@ HTTPRequest parse_http_request(const std::string &http_request)
                 break;
             }
             buffer.clear();
+        }
+        else
+        {
+            buffer += http_request[i];
         }
         ++i;
     }
@@ -85,10 +88,13 @@ HTTPRequest parse_http_request(const std::string &http_request)
         {
             do_lower(key);
             headers.insert(std::make_pair(std::move(key),std::move(value)));
+
             key.clear();
             value.clear();
+
             key_value = false;
             ++i;
+
             continue;
         }
 

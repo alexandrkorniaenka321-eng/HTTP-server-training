@@ -41,7 +41,7 @@ std::string parse_http(const char *buffer, size_t buffer_size)
             pos--;
             if (buffer[pos] == '/')
             {
-                std::reverse(client_text.begin(),client_text.end());
+                std::reverse(client_text.begin(), client_text.end());
                 return client_text;
             }
             else if (buffer[pos] == ' ')
@@ -54,7 +54,7 @@ std::string parse_http(const char *buffer, size_t buffer_size)
     return client_text;
 }
 
-std::string make_http_answer(const std::string& client_text)
+std::string make_http_answer(const std::string &client_text)
 {
     std::string body = "<h1>" + client_text + "</h1>";
     size_t contex_lenght = body.size();
@@ -104,15 +104,15 @@ int main()
         return 1;
     }
 
+    if (listen(server_fd, SOMAXCONN))
+    {
+        std::cout << "Listening failed: " << strerror(errno) << std::endl;
+        close(server_fd);
+        return 1;
+    }
+
     while (true)
     {
-        if (listen(server_fd, SOMAXCONN))
-        {
-            std::cout << "Listening failed: " << strerror(errno) << std::endl;
-            close(server_fd);
-            return 1;
-        }
-
         int user_fd = accept(server_fd, nullptr, nullptr);
         if (user_fd < 0)
         {
@@ -142,7 +142,7 @@ int main()
             return 1;
         }
 
-        std::string responce = make_http_answer(parse_http(buffer,512));
+        std::string responce = make_http_answer(parse_http(buffer, 512));
 
         ssize_t bytes_sended = send_all(user_fd, responce.c_str(), responce.size(), 0);
         if (bytes_sended > 0)
