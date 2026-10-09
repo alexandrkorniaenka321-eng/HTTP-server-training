@@ -29,7 +29,7 @@ void HTTPResponse::set_status_message(std::string status_message)
 
 void HTTPResponse::set_header(std::string key,std::string value)
 {
-    std::transform(key.begin(),key.end(),key.end(),[](unsigned char c){
+    std::transform(key.begin(),key.end(),key.begin(),[](unsigned char c){
         return std::tolower(c);
     });
     if(key == "content-length") return;

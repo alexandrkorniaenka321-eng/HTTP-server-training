@@ -9,8 +9,7 @@ public:
     HTTPRequest(std::string method,std::string request_URL,std::string HTTP_version,
         std::unordered_map<std::string,std::string> headers,std::string body);
 
-    std::string make_request_line() const;
-    std::string make_headers_block() const;
+    std::string get_url_request() const;
 
 private:
     std::string method;

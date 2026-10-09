@@ -123,7 +123,7 @@ int main()
             return 1;
         }
 
-        char buffer[512];
+        char buffer[1024];
         ssize_t receive = recv(user_fd, buffer, sizeof(buffer) - 1, 0);
 
         if (receive > 0)
@@ -135,6 +135,9 @@ int main()
         else if (receive == 0)
         {
             std::cout << "User close connection\n";
+            close(server_fd);
+            close(user_fd);
+            return 1;
         }
         else if (receive == -1)
         {
@@ -144,9 +147,65 @@ int main()
             return 1;
         }
 
-        std::string responce = make_http_answer(parse_http(buffer, 512));
+        HTTPRequest http_request = parse_http_request(std::string(buffer));
+        HTTPResponse http_response;
 
-        ssize_t bytes_sended = send_all(user_fd, responce.c_str(), responce.size(), 0);
+        if (http_request.get_url_request() == "/index.html")
+        {
+            http_response.set_body(R"(<!DOCTYPE html>
+            <html lang="ru">
+            <head>
+            <meta charset="UTF-8">
+            <title>Мой C++ Сервер</title>
+            </head>
+            <body>
+            <h1>Сервер работает!</h1>
+            <p>Это ответ, сгенерированный C++ сервером на чистых сокетах.</p>
+            <ul>
+            <li><a href="/json">Посмотреть JSON API</a></li>
+            <li><a href="/not-found">Проверить 404 страницу</a></li>
+            </ul>
+            </body>
+            </html>)");
+        }
+        else if (http_request.get_url_request() == "/api/status" || http_request.get_url_request() == "/json")
+        {
+            http_response.set_body(R"({
+            "status": "success",
+            "server": "Custom C++ HTTP Server",
+            "version": "1.0.0",
+            "uptime_seconds": 3600,
+            "features": ["TCP Sockets", "HTTP Parsing", "Routing"]
+            })");
+        }
+        else
+        {
+            http_response.set_body(R"(<!DOCTYPE html>
+            <html lang="ru">
+            <head>
+            <meta charset="UTF-8">
+            <title>404 - Страница не найдена</title>
+            <style>
+            body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+            h1 { color: #e74c3c; font-size: 48px; }
+            </style>
+            </head>
+            <body>
+            <h1>404</h1>
+            <h2>Упс! Запрошенная страница не найдена.</h2>
+            <p><a href="/index.html">Вернуться на главную</a></p>
+            </body>
+            </html>)");
+        }
+
+        std::string response = http_response.make_http_response();
+
+        std::cout << "========== RESPONSE ==========\n";
+        std::cout << response;
+        std::cout << "\n==============================\n";
+
+        ssize_t bytes_sended =
+        send_all(user_fd, response.c_str(), response.size(), 0);
         if (bytes_sended > 0)
         {
             std::cout << "Bytes sended: " << bytes_sended << std::endl;

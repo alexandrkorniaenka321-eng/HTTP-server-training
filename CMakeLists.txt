@@ -4,4 +4,8 @@ project("MyApp")
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(http_server main.cpp)
+add_executable(http_server
+    main.cpp
+    HTTPRequest.cpp
+    HTTPResponce.cpp
+)
