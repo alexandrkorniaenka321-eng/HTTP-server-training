@@ -1,12 +1,14 @@
 #include <iostream>
-#include <algorithm>
 #include <cstring>
-#include <string>
 #include <cerrno>
+#include <algorithm>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+
+#include "HTTPRequest.h"
+#include "HTTPResponce.h"
 
 ssize_t send_all(int socket_fd, const char *buffer, size_t buffer_size, int flags)
 {
