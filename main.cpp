@@ -27,26 +27,6 @@ ssize_t send_all(int socket_fd, const char *buffer, size_t buffer_size, int flag
     return total_sended;
 }
 
-ssize_t recv_all(int socket_fd, char *buffer, size_t buffer_size, int flags)
-{
-    size_t total_received = 0;
-
-    while (total_received < buffer_size)
-    {
-        ssize_t recv_result = recv(socket_fd, buffer + total_received, buffer_size - total_received, flags);
-        if (recv_result == 0)
-        {
-            return 0;
-        }
-        else if (recv_result == -1)
-        {
-            return -1;
-        }
-        total_received += recv_result;
-    }
-    return total_received;
-}
-
 std::string parse_http(const char *buffer, size_t buffer_size)
 {
     std::string client_text = buffer;
@@ -142,7 +122,7 @@ int main()
         }
 
         char buffer[512];
-        ssize_t receive = recv_all(user_fd, buffer, sizeof(buffer) - 1, 0);
+        ssize_t receive = recv(user_fd, buffer, sizeof(buffer) - 1, 0);
 
         if (receive > 0)
         {
